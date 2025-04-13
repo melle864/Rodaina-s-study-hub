@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Mobile Friendly Meta Tag -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rodaina's Study Hub</title>
+  <!-- Animate.css for animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    /* Base Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #eae2f8;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      line-height: 1.5;
+    }
+    header {
+      background: linear-gradient(135deg, #8e44ad, #3498db);
+      color: #fff;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0.5rem 0;
+      font-size: 2.2rem;
+    }
+    header p {
+      font-size: 1rem;
+      margin: 0;
+    }
+    /* Navigation Bar */
+    nav {
+      text-align: center;
+      margin: 1rem 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    nav button {
+      background: #3498db;
+      border: none;
+      color: #fff;
+      padding: 0.8rem 1.2rem;
+      margin: 0.3rem;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 1rem;
+      flex: 1 1 auto;
+      max-width: 150px;
+    }
+    nav button:hover {
+      background: #2980b9;
+    }
+    /* Section Containers */
+    .section {
+      display: none;
+      padding: 1rem;
+      max-width: 950px;
+      margin: 0 auto 2rem;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    /* Study Planner Styles */
+    .subject-tabs {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .subject-tabs button {
+      margin: 0.3rem;
+      border: none;
+      background: #8e44ad;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 90px;
+    }
+    .subject-tabs button.active {
+      background: #3498db;
+    }
+    .subject-panel {
+      display: none;
+      animation: fadeIn 0.5s;
+    }
+    .subject-panel.active {
+      display: block;
+    }
+    .subject-panel input, .subject-panel textarea {
+      width: 100%;
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .subject-panel button {
+      background: #3498db;
+      border: none;
+      color: #fff;
+      padding: 0.5rem;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 1rem;
+      width: 100%;
+    }
+    .subject-panel ul {
+      list-style: none;
+      padding: 0;
+    }
+    .subject-panel li {
+      background: #f3f3f3;
+      margin: 0.4rem 0;
+      padding: 0.4rem 0.8rem;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    .subject-panel li button.deleteEvent {
+      background: #e74c3c;
+      border: none;
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    /* Calendar Styles */
+    #calendarBox {
+      margin-top: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.9rem;
+    }
+    #calendarBox table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #calendarBox th, #calendarBox td {
+      padding: 0.5rem;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+    #calendarBox th {
+      background: #8e44ad;
+      color: #fff;
+    }
+    table#calendarTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    table#calendarTable, table#calendarTable th, table#calendarTable td {
+      border: 1px solid #ddd;
+    }
+    table#calendarTable th, table#calendarTable td {
+      padding: 0.8rem;
+      text-align: left;
+    }
+    table#calendarTable th {
+      background: #8e44ad;
+      color: #fff;
+    }
+    table#calendarTable td.deleteCell {
+      text-align: center;
+    }
+    table#calendarTable button.deleteCalendarEvent {
+      background: #e74c3c;
+      border: none;
+      color: #fff;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    /* Modal Popup */
+    #congratsModal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+    }
+    #congratsModal .modal-content {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 90%;
+      margin: 0 1rem;
+    }
+    /* Minigames Styles */
+    .gameContainer {
+      margin-top: 1rem;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #f0f0f0;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+    /* Rock-Paper-Scissors */
+    #rpsGame button {
+      background: #e67e22;
+      border: none;
+      color: #fff;
+      padding: 0.5rem 0.8rem;
+      margin: 0.3rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    /* Color Click Game */
+    #colorClickGame {
+      position: relative;
+      height: 300px;
+      background: #ecf0f1;
+      margin-top: 1rem;
+      border: 2px dashed #8e44ad;
+      overflow: hidden;
+    }
+    #clickableBox {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #8e44ad, #3498db);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.5s ease;
+    }
+    /* Simon Says Game */
+    #simonGame {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    #simonButtons button {
+      width: 70px;
+      height: 70px;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      opacity: 0.8;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    #simonButtons button.active {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    /* Emoji Memory Game */
+    #emojiGame {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    .emojiCard {
+      background: #3498db;
+      border: 2px solid #8e44ad;
+      border-radius: 8px;
+      height: 80px;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: transparent;
+      transition: background 0.3s;
+    }
+    .emojiCard.flipped {
+      background: #f0f0f0;
+      color: #333;
+    }
+    /* Guess the Number Game */
+    #guessGame {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    #guessGame input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 80px;
+    }
+    /* Guess the Password Game */
+    #passwordGame {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    #passwordGame input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      width: 100px;
+      margin: 0.5rem;
+    }
+    #passwordHints {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #555;
+    }
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    /* Mobile Media Queries */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.8rem; }
+      header p { font-size: 0.9rem; }
+      nav button { font-size: 0.9rem; max-width: 120px; }
+      .subject-tabs button { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
+      .subject-panel input, .subject-panel textarea { font-size: 0.9rem; }
+      .subject-panel button { font-size: 0.9rem; }
+      .subject-panel li { font-size: 0.8rem; }
+      .modal-content { padding: 1.5rem; }
+      .gameContainer { font-size: 0.8rem; }
+      #simonButtons button { width: 60px; height: 60px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Audio Elements -->
+  <audio id="chimeAudio" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+  <audio id="passwordSuccessAudio" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+  <audio id="passwordErrorAudio" src="https://www.soundjay.com/misc/sounds/fail-buzzer-01.mp3"></audio>
+  
+  <!-- Modal Popup for Congratulatory Messages -->
+  <div id="congratsModal" class="animate__animated">
+    <div class="modal-content">
+      <h2 id="modalTitle"></h2>
+      <p id="modalMessage"></p>
+      <button onclick="closeModal()" style="background:#3498db; border:none; color:#fff; padding:0.5rem 1rem; border-radius:4px;">Close</button>
+    </div>
+  </div>
+  
+  <!-- Header -->
+  <header class="animate__animated animate__fadeInDown">
+    <h1>Congratulations, Rodaina!</h1>
+    <p>You did an amazing job finishing your chemistry study. Keep shining in all your studies!</p>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <button id="plannerNav">Study Planner</button>
+    <button id="calendarNav">Calendar</button>
+    <button id="gamesNav">Minigames</button>
+  </nav>
+
+  <!-- Main Content -->
+  <div id="content">
+    <!-- Study Planner Section -->
+    <section id="plannerSection" class="section animate__animated animate__fadeIn">
+      <h2>Study Planner</h2>
+      <div class="subject-tabs">
+        <button class="subjectTab active" data-subject="biology">Biology</button>
+        <button class="subjectTab" data-subject="chemistry">Chemistry</button>
+        <button class="subjectTab" data-subject="physics">Physics</button>
+        <button class="subjectTab" data-subject="arabic">Arabic</button>
+        <button class="subjectTab" data-subject="english">English</button>
+        <button class="subjectTab" data-subject="general">General</button>
+      </div>
+      
+      <!-- Panels for each subject -->
+      <div id="biology" class="subject-panel active">
+        <h3>Biology</h3>
+        <input type="text" placeholder="Event Title" class="eventTitle">
+        <input type="date" class="eventDate">
+        <textarea placeholder="Describe your study plan..." class="eventDesc"></textarea>
+        <br>
+        <button class="saveEvent">Add Event</button>
+        <ul class="eventList"></ul>
+      </div>
+      <div id="chemistry" class="subject-panel">
+        <h3>Chemistry</h3>
+        <input type="text" placeholder="Event Title" class="eventTitle">
+        <input type="date" class="eventDate">
+        <textarea placeholder="Describe your study plan..." class="eventDesc"></textarea>
+        <br>
+        <button class="saveEvent">Add Event</button>
+        <ul class="eventList"></ul>
+      </div>
+      <div id="physics" class="subject-panel">
+        <h3>Physics</h3>
+        <input type="text" placeholder="Event Title" class="eventTitle">
+        <input type="date" class="eventDate">
+        <textarea placeholder="Describe your study plan..." class="eventDesc"></textarea>
+        <br>
+        <button class="saveEvent">Add Event</button>
+        <ul class="eventList"></ul>
+      </div>
+      <div id="arabic" class="subject-panel">
+        <h3>Arabic</h3>
+        <input type="text" placeholder="Event Title" class="eventTitle">
+        <input type="date" class="eventDate">
+        <textarea placeholder="Describe your study plan..." class="eventDesc"></textarea>
+        <br>
+        <button class="saveEvent">Add Event</button>
+        <ul class="eventList"></ul>
+      </div>
+      <div id="english" class="subject-panel">
+        <h3>English</h3>
+        <input type="text" placeholder="Event Title" class="eventTitle">
+        <input type="date" class="eventDate">
+        <textarea placeholder="Describe your study plan..." class="eventDesc"></textarea>
+        <br>
+        <button class="saveEvent">Add Event</button>
+        <ul class="eventList"></ul>
+      </div>
+      <div id="general" class="subject-panel">
+        <h3>General</h3>
+        <input type="text" placeholder="Event Title" class="eventTitle">
+        <input type="date" class="eventDate">
+        <textarea placeholder="Describe your plan..." class="eventDesc"></textarea>
+        <br>
+        <button class="saveEvent">Add Event</button>
+        <ul class="eventList"></ul>
+      </div>
+    </section>
+
+    <!-- Calendar Section -->
+    <section id="calendarSection" class="section animate__animated animate__fadeIn">
+      <h2>Your Calendar</h2>
+      <p>All your study events across subjects:</p>
+      <!-- Calendar Table -->
+      <table id="calendarTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Subject</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Done?</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dynamically inserted events -->
+        </tbody>
+      </table>
+      <!-- Full Calendar Box -->
+      <div id="calendarBox" class="animate__animated animate__fadeIn">
+        <!-- A simple calendar for current month will be generated -->
+      </div>
+    </section>
+
+    <!-- Minigames Section -->
+    <section id="gamesSection" class="section animate__animated animate__fadeIn">
+      <h2>Minigames</h2>
+      
+      <!-- Rock-Paper-Scissors Game -->
+      <div class="gameContainer">
+        <h3>Rock-Paper-Scissors</h3>
+        <p>Choose your move:</p>
+        <button class="rpsMove" data-move="rock">Rock</button>
+        <button class="rpsMove" data-move="paper">Paper</button>
+        <button class="rpsMove" data-move="scissors">Scissors</button>
+        <p id="rpsResult" class="animate__animated"></p>
+      </div>
+      
+      <!-- Color Click Game -->
+      <div class="gameContainer">
+        <h3>Color Click Game</h3>
+        <p>Click the moving box to score points!</p>
+        <div id="colorClickGame">
+          <div id="clickableBox"></div>
+        </div>
+        <p>Your Score: <span id="clickScore">0</span></p>
+      </div>
+
+      <!-- Simon Says Memory Game -->
+      <div class="gameContainer" id="simonGame">
+        <h3>Simon Says Memory Game</h3>
+        <p>Watch the sequence and repeat it.</p>
+        <button id="startSimon">Start Simon Says</button>
+        <div id="simonButtons">
+          <button style="background:#8e44ad;" data-color="purple"></button>
+          <button style="background:#3498db;" data-color="blue"></button>
+          <button style="background:#27ae60;" data-color="green"></button>
+          <button style="background:#e67e22;" data-color="orange"></button>
+        </div>
+        <p>Current Level: <span id="simonLevel">0</span> | High Score: <span id="simonHighScore">0</span></p>
+      </div>
+      
+      <!-- Emoji Memory Game -->
+      <div class="gameContainer">
+        <h3>Emoji Memory Game</h3>
+        <p>Match all the emoji pairs!</p>
+        <div id="emojiGame"></div>
+        <button id="resetEmoji">Reset Emoji Game</button>
+      </div>
+      
+      <!-- Guess the Number Game -->
+      <div class="gameContainer" id="guessGame">
+        <h3>Guess the Number</h3>
+        <p>I'm thinking of a number between 1 and 100. Try to guess it!</p>
+        <input type="number" id="guessInput" placeholder="Your guess">
+        <button id="guessBtn">Guess</button>
+        <p id="guessMsg"></p>
+        <button id="resetGuess" style="display:none;">Reset Game</button>
+      </div>
+      
+      <!-- Guess the Password Game -->
+      <div class="gameContainer" id="passwordGame">
+        <h3>Guess the Password Game</h3>
+        <p>Guess the secret 3‑digit password (digits 0‑9). You have 6 attempts!</p>
+        <input type="text" id="passwordGuess" placeholder="e.g., 867">
+        <button id="passwordBtn">Submit Guess</button>
+        <div id="passwordHints"></div>
+        <p>Attempts: <span id="passwordAttempts">0</span>/6</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+  // ---------- Navigation -----------
+  const plannerNav = document.getElementById('plannerNav');
+  const calendarNav = document.getElementById('calendarNav');
+  const gamesNav = document.getElementById('gamesNav');
+  const plannerSection = document.getElementById('plannerSection');
+  const calendarSection = document.getElementById('calendarSection');
+  const gamesSection = document.getElementById('gamesSection');
+  
+  function showSection(section) {
+    plannerSection.style.display = "none";
+    calendarSection.style.display = "none";
+    gamesSection.style.display = "none";
+    section.style.display = "block";
+  }
+  
+  plannerNav.addEventListener('click', () => showSection(plannerSection));
+  calendarNav.addEventListener('click', () => {
+    showSection(calendarSection);
+    loadCalendar();
+    generateCalendarBox();
+  });
+  gamesNav.addEventListener('click', () => showSection(gamesSection));
+  
+  // Show planner by default
+  showSection(plannerSection);
+  
+  // ---------- Study Planner & Calendar -----------
+  const subjects = ["biology", "chemistry", "physics", "arabic", "english", "general"];
+  
+  // Subject tab behavior
+  const subjectTabs = document.querySelectorAll('.subjectTab');
+  const subjectPanels = document.querySelectorAll('.subject-panel');
+  
+  subjectTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      subjectTabs.forEach(t => t.classList.remove('active'));
+      subjectPanels.forEach(panel => panel.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.getAttribute('data-subject')).classList.add('active');
+    });
+  });
+  
+  // Save event functionality for each subject
+  document.querySelectorAll('.saveEvent').forEach(button => {
+    button.addEventListener('click', function() {
+      const panel = this.parentElement;
+      const subject = panel.id;
+      const title = panel.querySelector('.eventTitle').value;
+      const date = panel.querySelector('.eventDate').value;
+      const desc = panel.querySelector('.eventDesc').value;
+      if(!title || !date) {
+        alert("Please enter at least a title and a date.");
+        return;
+      }
+      const event = { title, date, desc, subject, completed: false };
+      let events = JSON.parse(localStorage.getItem("events-" + subject)) || [];
+      events.push(event);
+      localStorage.setItem("events-" + subject, JSON.stringify(events));
+      panel.querySelector('.eventTitle').value = "";
+      panel.querySelector('.eventDate').value = "";
+      panel.querySelector('.eventDesc').value = "";
+      displayEvents(panel, events);
+    });
+  });
+  
+  // Display events in subject panel with a delete button
+  function displayEvents(panel, events) {
+    const list = panel.querySelector('.eventList');
+    list.innerHTML = "";
+    events.forEach((ev, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${ev.date} - ${ev.title}: ${ev.desc} 
+        <button class="deleteEvent" data-index="${index}">Delete</button>`;
+      list.appendChild(li);
+    });
+  }
+  
+  // Use event delegation to handle deletion from study planner lists
+  document.querySelectorAll('.eventList').forEach(list => {
+    list.addEventListener('click', function(e) {
+      if(e.target && e.target.classList.contains("deleteEvent")) {
+        const index = e.target.getAttribute("data-index");
+        const panel = this.parentElement;
+        const subject = panel.id;
+        let events = JSON.parse(localStorage.getItem("events-" + subject)) || [];
+        events.splice(index, 1);
+        localStorage.setItem("events-" + subject, JSON.stringify(events));
+        displayEvents(panel, events);
+        loadCalendar();
+      }
+    });
+  });
+  
+  // Load events on page load
+  subjects.forEach(sub => {
+    const panel = document.getElementById(sub);
+    let events = JSON.parse(localStorage.getItem("events-" + sub)) || [];
+    displayEvents(panel, events);
+  });
+  
+  // Load Calendar table (aggregate events) with a delete button
+  function loadCalendar() {
+    const tbody = document.querySelector("#calendarTable tbody");
+    tbody.innerHTML = "";
+    subjects.forEach(sub => {
+      let events = JSON.parse(localStorage.getItem("events-" + sub)) || [];
+      events.forEach((ev, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${ev.date}</td>
+          <td>${ev.subject}</td>
+          <td>${ev.title}</td>
+          <td>${ev.desc}</td>
+          <td><input type="checkbox" data-subject="${ev.subject}" data-index="${index}" ${ev.completed ? "checked" : ""}></td>
+          <td class="deleteCell"><button class="deleteCalendarEvent" data-subject="${ev.subject}" data-index="${index}">Delete</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  }
+  
+  // Handle deletion from calendar table
+  document.querySelector("#calendarTable tbody").addEventListener('click', function(e) {
+    if(e.target && e.target.classList.contains("deleteCalendarEvent")) {
+      const subject = e.target.getAttribute("data-subject");
+      const index = e.target.getAttribute("data-index");
+      let events = JSON.parse(localStorage.getItem("events-" + subject)) || [];
+      events.splice(index, 1);
+      localStorage.setItem("events-" + subject, JSON.stringify(events));
+      loadCalendar();
+    }
+  });
+  
+  // ---------- Encouraging & Diverse Pop-up Messages ----------
+  const lovePoems = [
+    "Roses are red, violets are blue, every moment with you is a dream come true.",
+    "In every heartbeat I find a verse of love for you.",
+    "Your smile lights up the darkest nights; I adore you!",
+    "The words of love cannot measure my care—each moment with you is a treasure.",
+    "As the stars shine above, my love for you grows each day.",
+    "You are the melody that makes my heart sing.",
+    "Every success of yours makes me prouder than words can say.",
+    "You light up my world and inspire me every day.",
+    "Your passion and strength are unmatched, my love."
+  ];
+  
+  const additionalEncouragements = [
+    "Great job! Your dedication is truly inspiring.",
+    "Fantastic work! Every step forward is a victory.",
+    "Keep it up, Rodaina! I am so proud of you!",
+    "You're unstoppable—keep pushing forward!",
+    "Every challenge you conquer is a testament to your brilliance.",
+    "I love you more with every achievement; keep shining!",
+    "Your hard work and passion light the way.",
+    "You are a star, and your light brightens my world!",
+    "You're amazing, and every step you take brings you closer to greatness.",
+    "Keep moving forward! Your success is inevitable.",
+    "Your brilliance is boundless—never stop reaching for the stars.",
+    "You make every challenge look easy. I love you!",
+    "Your determination is as beautiful as your smile.",
+    "Every accomplishment is proof of how extraordinary you are.",
+    "I cherish every moment and every success on your journey."
+  ];
+  
+  const allEncouragingMessages = [...lovePoems, ...additionalEncouragements];
+  
+  function showModal(title, message) {
+    const modal = document.getElementById("congratsModal");
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalMessage").textContent = message;
+    modal.className = "animate__animated animate__zoomIn";
+    modal.style.display = "flex";
+  }
+  
+  function closeModal() {
+    const modal = document.getElementById("congratsModal");
+    modal.className = "animate__animated animate__zoomOut";
+    setTimeout(() => { modal.style.display = "none"; }, 500);
+  }
+  
+  // When checking an event in calendar, show a modal with a diverse encouraging message.
+  document.querySelector("#calendarTable tbody").addEventListener('change', function(e) {
+    if(e.target && e.target.type === "checkbox") {
+      const subject = e.target.getAttribute("data-subject");
+      const index = e.target.getAttribute("data-index");
+      let events = JSON.parse(localStorage.getItem("events-" + subject)) || [];
+      if(e.target.checked) {
+        events[index].completed = true;
+        localStorage.setItem("events-" + subject, JSON.stringify(events));
+        loadCalendar();
+        const randomMessage = allEncouragingMessages[Math.floor(Math.random() * allEncouragingMessages.length)];
+        showModal("Congratulations!", randomMessage + " I love you, Rodaina!");
+      } else {
+        events[index].completed = false;
+        localStorage.setItem("events-" + subject, JSON.stringify(events));
+        loadCalendar();
+      }
+    }
+  });
+  
+  // ---------- Generate a Full Calendar Box (Simple Version) -----------
+  function generateCalendarBox() {
+    const calendarBox = document.getElementById("calendarBox");
+    calendarBox.innerHTML = "";
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    
+    let table = "<table><thead><tr>";
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    weekdays.forEach(day => { table += `<th>${day}</th>`; });
+    table += "</tr></thead><tbody><tr>";
+    
+    for(let i = 0; i < firstDay; i++) { table += "<td></td>"; }
+    for(let d = 1; d <= daysInMonth; d++) {
+      const dateStr = currentYear + "-" + String(currentMonth+1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+      let eventFound = false;
+      subjects.forEach(sub => {
+        let events = JSON.parse(localStorage.getItem("events-" + sub)) || [];
+        events.forEach(ev => { if(ev.date === dateStr) eventFound = true; });
+      });
+      const cellStyle = eventFound ? ' style="background: #d1c4e9;"' : "";
+      table += `<td${cellStyle}>${d}</td>`;
+      if((d + firstDay) % 7 === 0 && d != daysInMonth) { table += "</tr><tr>"; }
+    }
+    table += "</tr></tbody></table>";
+    calendarBox.innerHTML = table;
+  }
+  
+  // ---------- Minigames -----------
+  // -- Rock-Paper-Scissors --
+  const moves = ['rock', 'paper', 'scissors'];
+  document.querySelectorAll('.rpsMove').forEach(button => {
+    button.addEventListener('click', function() {
+      const userMove = this.getAttribute('data-move');
+      const compMove = moves[Math.floor(Math.random() * moves.length)];
+      let result = "";
+      if(userMove === compMove) { result = "It's a tie!"; }
+      else if((userMove === 'rock' && compMove === 'scissors') ||
+              (userMove === 'paper' && compMove === 'rock') ||
+              (userMove === 'scissors' && compMove === 'paper')) { result = "You win!"; }
+      else { result = "You lose!"; }
+      document.getElementById('rpsResult').textContent = "You chose " + userMove + ". Computer chose " + compMove + ". " + result;
+    });
+  });
+  
+  // -- Color Click Game --
+  const clickableBox = document.getElementById('clickableBox');
+  const clickScoreEl = document.getElementById('clickScore');
+  let clickScore = 0;
+  function moveBox() {
+    const container = document.getElementById('colorClickGame');
+    const containerRect = container.getBoundingClientRect();
+    const maxX = containerRect.width - clickableBox.offsetWidth;
+    const maxY = containerRect.height - clickableBox.offsetHeight;
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+    clickableBox.style.transform = `translate(${randomX}px, ${randomY}px)`;
+  }
+  clickableBox.addEventListener('click', () => {
+    clickScore++;
+    clickScoreEl.textContent = clickScore;
+    moveBox();
+  });
+  moveBox();
+  
+  // -- Simon Says Memory Game --
+  const simonColors = ["purple", "blue", "green", "orange"];
+  let simonSequence = [];
+  let simonUserSequence = [];
+  let simonLevel = 0;
+  let simonHighScore = 0;
+  const chimeAudio = document.getElementById('chimeAudio');
+  const simonLevelEl = document.getElementById('simonLevel');
+  const simonHighScoreEl = document.getElementById('simonHighScore');
+  const simonButtons = document.querySelectorAll("#simonButtons button");
+  
+  document.getElementById('startSimon').addEventListener('click', startSimonGame);
+  
+  function startSimonGame() {
+    simonSequence = [];
+    simonUserSequence = [];
+    simonLevel = 0;
+    simonLevelEl.textContent = simonLevel;
+    nextSimonRound();
+  }
+  
+  function nextSimonRound() {
+    simonUserSequence = [];
+    simonLevel++;
+    simonLevelEl.textContent = simonLevel;
+    if (simonLevel > simonHighScore) {
+      simonHighScore = simonLevel;
+      simonHighScoreEl.textContent = simonHighScore;
+    }
+    const nextColor = simonColors[Math.floor(Math.random() * simonColors.length)];
+    simonSequence.push(nextColor);
+    playSimonSequence();
+  }
+  
+  function playSimonSequence() {
+    let i = 0;
+    const interval = setInterval(() => {
+      const color = simonSequence[i];
+      const btn = Array.from(simonButtons).find(b => b.getAttribute('data-color') === color);
+      btn.classList.add('active');
+      chimeAudio.play();
+      setTimeout(() => { btn.classList.remove('active'); }, 500);
+      i++;
+      if (i >= simonSequence.length) clearInterval(interval);
+    }, 700);
+  }
+  
+  simonButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const color = btn.getAttribute('data-color');
+      simonUserSequence.push(color);
+      const index = simonUserSequence.length - 1;
+      if (simonUserSequence[index] !== simonSequence[index]) {
+        showModal("Oops!", "Wrong sequence! Game Over. Keep practicing!");
+        startSimonGame();
+      } else {
+        if (simonUserSequence.length === simonSequence.length) { setTimeout(nextSimonRound, 1000); }
+      }
+    });
+  });
+  
+  // -- Emoji Memory Game --
+  const emojiGameContainer = document.getElementById('emojiGame');
+  const resetEmojiBtn = document.getElementById('resetEmoji');
+  let emojiCards = [];
+  function initEmojiGame() {
+    const emojis = ["😀", "😎", "😍", "🤩", "🥳", "😇", "😋", "🤓"];
+    let cardEmojis = [...emojis, ...emojis];
+    cardEmojis.sort(() => Math.random() - 0.5);
+    emojiGameContainer.innerHTML = "";
+    emojiCards = [];
+    cardEmojis.forEach((emoji) => {
+      const card = document.createElement('div');
+      card.classList.add('emojiCard');
+      card.setAttribute('data-emoji', emoji);
+      card.addEventListener('click', flipEmojiCard);
+      emojiGameContainer.appendChild(card);
+      emojiCards.push(card);
+    });
+  }
+  
+  let flippedCards = [];
+  function flipEmojiCard() {
+    if(this.classList.contains('flipped') || flippedCards.length === 2) return;
+    this.classList.add('flipped');
+    this.textContent = this.getAttribute('data-emoji');
+    flippedCards.push(this);
+    if (flippedCards.length === 2) {
+      if (flippedCards[0].getAttribute('data-emoji') === flippedCards[1].getAttribute('data-emoji')) {
+        flippedCards = [];
+        if(emojiCards.every(card => card.classList.contains('flipped'))) {
+          showModal("Bravo!", "Awesome! You matched all emojis. I love you, Rodaina!");
+        }
+      } else {
+        setTimeout(() => {
+          flippedCards.forEach(card => { card.classList.remove('flipped'); card.textContent = ""; });
+          flippedCards = [];
+        }, 1000);
+      }
+    }
+  }
+  resetEmojiBtn.addEventListener('click', initEmojiGame);
+  initEmojiGame();
+  
+  // -- Guess the Number Game --
+  let guessNumber = Math.floor(Math.random() * 100) + 1;
+  const guessInput = document.getElementById('guessInput');
+  const guessBtn = document.getElementById('guessBtn');
+  const guessMsg = document.getElementById('guessMsg');
+  const resetGuessBtn = document.getElementById('resetGuess');
+  
+  guessBtn.addEventListener('click', () => {
+    const guess = Number(guessInput.value);
+    if(!guess) return;
+    if (guess === guessNumber) {
+      guessMsg.textContent = "Correct! Well done.";
+      resetGuessBtn.style.display = "inline-block";
+      showModal("Great Job!", "You guessed the number correctly! I love you, Rodaina.");
+    } else if (guess < guessNumber) {
+      guessMsg.textContent = "Too low! Try again.";
+    } else {
+      guessMsg.textContent = "Too high! Try again.";
+    }
+  });
+  
+  resetGuessBtn.addEventListener('click', () => {
+    guessNumber = Math.floor(Math.random() * 100) + 1;
+    guessMsg.textContent = "";
+    guessInput.value = "";
+    resetGuessBtn.style.display = "none";
+  });
+  
+  // -- Guess the Password Game (Improved Version) --
+  let passwordSecret = String(Math.floor(Math.random()*900) + 100);
+  let passwordAttempts = 0;
+  const passwordGuessInput = document.getElementById('passwordGuess');
+  const passwordBtn = document.getElementById('passwordBtn');
+  const passwordHintsDiv = document.getElementById('passwordHints');
+  const passwordAttemptsEl = document.getElementById('passwordAttempts');
+  
+  passwordBtn.addEventListener('click', () => {
+    const guess = passwordGuessInput.value.trim();
+    if(guess.length !== 3 || isNaN(guess)) {
+      alert("Please enter a valid 3-digit number.");
+      return;
+    }
+    passwordAttempts++;
+    passwordAttemptsEl.textContent = passwordAttempts;
+    
+    let correctPosition = 0, misplaced = 0;
+    for(let i = 0; i < 3; i++) {
+      if(guess[i] === passwordSecret[i]) { correctPosition++; }
+      else if(passwordSecret.includes(guess[i])) { misplaced++; }
+    }
+    
+    let hintMessage = "";
+    if(correctPosition === 3) {
+      hintMessage = "Bingo! You guessed the password!";
+      passwordHintsDiv.innerHTML += `<p>${hintMessage}</p>`;
+      document.getElementById('passwordSuccessAudio').play();
+      showModal("Incredible!", "You cracked the secret password! I love you beyond words.");
+      passwordSecret = String(Math.floor(Math.random()*900) + 100);
+      passwordAttempts = 0;
+      passwordAttemptsEl.textContent = passwordAttempts;
+      passwordHintsDiv.innerHTML = "";
+      passwordGuessInput.value = "";
+      return;
+    } else {
+      hintMessage = `Hint: ${guess} → ${correctPosition} digit(s) correct, ${misplaced} misplaced.`;
+      document.getElementById('passwordErrorAudio').play();
+    }
+    passwordHintsDiv.innerHTML += `<p>${hintMessage}</p>`;
+    
+    if(passwordAttempts >= 6) {
+      showModal("Almost There!", `The secret password was ${passwordSecret}. Let's try again!`);
+      passwordSecret = String(Math.floor(Math.random()*900) + 100);
+      passwordAttempts = 0;
+      passwordAttemptsEl.textContent = passwordAttempts;
+      passwordHintsDiv.innerHTML = "";
+      passwordGuessInput.value = "";
+    }
+  });
+  
+  </script>
+</body>
+</html>
